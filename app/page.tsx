@@ -2,6 +2,22 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
+import { 
+  ArrowRight, 
+  Upload, 
+  Sparkles, 
+  Check, 
+  Image as ImageIcon, 
+  Download, 
+  Share2, 
+  Layers, 
+  Zap, 
+  ShieldCheck,
+  Instagram,
+  Twitter,
+  Linkedin,
+  MapPin
+} from "lucide-react";
 
 export default function Home() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -61,7 +77,7 @@ export default function Home() {
           <div className="w-10 h-10 bg-gradient-gold rounded-xl flex items-center justify-center shadow-lg shadow-gold/20 group-hover:rotate-12 transition-transform">
             <span className="text-onyx font-bold text-2xl">E</span>
           </div>
-          <span className="text-2xl font-bold tracking-tighter text-gradient-gold">ELEVATION</span>
+          <span className="text-2xl font-bold tracking-tighter text-gradient-gold uppercase">Elevation</span>
         </div>
 
         <div className="hidden md:flex gap-1 gap-x-8 text-xs font-bold tracking-widest uppercase opacity-80">
@@ -85,19 +101,19 @@ export default function Home() {
           <span className="text-xs font-bold tracking-[0.2em] text-gold uppercase">Industry Leading AI Interior Design</span>
         </div>
 
-        <h1 className="text-6xl md:text-8xl font-bold tracking-tighter leading-[1.1] mb-8 animate-in fade-in slide-in-from-bottom-5 duration-700">
+        <h1 className="text-6xl md:text-8xl font-bold tracking-tighter leading-[1.1] mb-8">
           Reimagine Your <br />
           <span className="text-gradient-gold italic font-display">Living Space</span>
         </h1>
 
-        <p className="max-w-2xl text-lg text-alabaster/60 leading-relaxed mb-12 animate-in fade-in duration-1000 delay-200">
+        <p className="max-w-2xl text-lg text-alabaster/60 leading-relaxed mb-12">
           We combine the precision of Artificial Intelligence with the soul of bespoke architecture to transform your envisions into luxurious reality.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-6 mb-20">
           <Link href="#design-lab" className="px-10 py-5 bg-gradient-gold text-onyx font-black text-lg rounded-2xl shadow-2xl shadow-gold/30 hover:shadow-gold/50 hover:-translate-y-1 transition-all flex items-center gap-3 group">
             TRY AI DESIGNER
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-1 transition-transform"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
           </Link>
 
           <button className="px-10 py-5 glass rounded-2xl border border-white/10 font-bold text-lg hover:bg-white/10 hover:-translate-y-1 transition-all">
@@ -142,7 +158,7 @@ export default function Home() {
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-3 text-alabaster/80 font-medium">
                     <div className="w-6 h-6 rounded-full bg-gold/20 flex items-center justify-center border border-gold/40">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      <Check size={14} className="text-gold" strokeWidth={3} />
                     </div>
                     {item}
                   </li>
@@ -162,7 +178,7 @@ export default function Home() {
                   onClick={() => fileInputRef.current?.click()}
                   className="w-full md:w-auto px-10 py-5 glass-gold border border-gold/30 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-gold/10 transition-all group"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-bounce"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                  <Upload size={24} className="text-gold animate-bounce" />
                   UPLOAD YOUR ROOM IMAGE
                 </button>
               ) : (
@@ -179,14 +195,14 @@ export default function Home() {
                       </>
                     ) : (
                       <>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        <Sparkles size={24} />
                         GENERATE LUXURY REDESIGN
                       </>
                     )}
                   </button>
                   <button
                     onClick={() => setSelectedImage(null)}
-                    className="text-sm font-bold text-alabaster/40 hover:text-sosRed transition-colors uppercase tracking-widest"
+                    className="text-sm font-bold text-alabaster/40 hover:text-red-500 transition-colors uppercase tracking-widest"
                   >
                     Remove and try another
                   </button>
@@ -221,7 +237,7 @@ export default function Home() {
                   </>
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-alabaster/20 p-12 text-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.5" strokeLinecap="round" strokeLinejoin="round" className="mb-6"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    <ImageIcon size={80} strokeWidth={0.5} className="mb-6" />
                     <p className="text-xl font-medium tracking-tight">Your AI preview will appear here</p>
                   </div>
                 )}
@@ -231,7 +247,7 @@ export default function Home() {
               {designResult && (
                 <div className="absolute -bottom-10 -right-4 md:-right-10 w-full max-w-sm glass-gold border border-gold/40 p-8 rounded-3xl shadow-2xl animate-in zoom-in-95 duration-500">
                   <div className="flex items-center gap-2 mb-4">
-                    <span className="w-2 h-2 bg-healthGood rounded-full animate-pulse"></span>
+                    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                     <span className="text-xs font-bold text-gold uppercase tracking-[0.2em]">AI Design Report</span>
                   </div>
                   <h4 className="text-xl font-bold mb-4">Recommended Aesthetic</h4>
@@ -240,8 +256,12 @@ export default function Home() {
                     dangerouslySetInnerHTML={{ __html: designResult.replace(/\*\*(.*?)\*\*/g, '<b class="text-gold">$1</b>') }}
                   />
                   <div className="mt-6 flex gap-3">
-                    <button className="flex-1 py-2 rounded-xl bg-gold/10 border border-gold/20 text-gold text-xs font-bold hover:bg-gold/20 transition-all uppercase tracking-wider">Download PDF</button>
-                    <button className="px-4 py-2 rounded-xl glass border border-white/10 text-xs font-bold hover:bg-white/10 transition-all uppercase">Share</button>
+                    <button className="flex-1 py-2 rounded-xl bg-gold/10 border border-gold/20 text-gold text-xs font-bold hover:bg-gold/20 transition-all uppercase tracking-wider flex items-center justify-center gap-2">
+                      <Download size={14} /> Download PDF
+                    </button>
+                    <button className="px-4 py-2 rounded-xl glass border border-white/10 text-xs font-bold hover:bg-white/10 transition-all uppercase">
+                      <Share2 size={14} />
+                    </button>
                   </div>
                 </div>
               )}
@@ -265,22 +285,22 @@ export default function Home() {
             {
               title: "Computational Layouts",
               desc: "Optimal space utilization generated through thousands of algorithmic iterations.",
-              icon: "M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+              icon: <Layers size={32} className="text-gold" />
             },
             {
               title: "Material Science",
               desc: "AI-curated textures and sustainable materials that resonate with your personal style.",
-              icon: "M13 2L3 14h9l-1 8 10-12h-9l1-8z"
+              icon: <Zap size={32} className="text-gold" />
             },
             {
               title: "Bespoke Finishing",
               desc: "The final human touch by master architects to ensure perfection in every corner.",
-              icon: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+              icon: <ShieldCheck size={32} className="text-gold" />
             }
           ].map((feature, i) => (
             <div key={i} className="glass group p-12 rounded-[50px] border border-white/5 hover:bg-white/10 hover:border-gold/20 transition-all duration-500">
               <div className="w-16 h-16 bg-gold/5 rounded-2xl flex items-center justify-center mb-10 border border-white/5 group-hover:border-gold/40 transition-all group-hover:rotate-6">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={feature.icon}></path></svg>
+                {feature.icon}
               </div>
               <h3 className="text-2xl font-bold mb-5 group-hover:text-gold transition-colors">{feature.title}</h3>
               <p className="text-alabaster/50 leading-relaxed group-hover:text-alabaster transition-colors italic">{feature.desc}</p>
@@ -308,15 +328,19 @@ export default function Home() {
               <div className="w-8 h-8 bg-gradient-gold rounded-lg flex items-center justify-center">
                 <span className="text-onyx font-bold text-lg">E</span>
               </div>
-              <span className="text-xl font-bold tracking-tighter text-gradient-gold">ELEVATION</span>
+              <span className="text-xl font-bold tracking-tighter text-gradient-gold uppercase">Elevation</span>
             </div>
             <p className="text-alabaster/40 max-w-sm leading-relaxed mb-8">
               The future of luxury living, defined by artificial intelligence and crafted by world-class architects.
             </p>
             <div className="flex gap-6">
-              {['instagram', 'twitter', 'linkedin'].map((social) => (
-                <div key={social} className="w-10 h-10 glass rounded-xl flex items-center justify-center border border-white/10 hover:border-gold/30 cursor-pointer transition-all">
-                  <div className="w-2 h-2 bg-alabaster/40 rounded-full group-hover:bg-gold"></div>
+              {[
+                { name: 'instagram', icon: <Instagram size={18} /> },
+                { name: 'twitter', icon: <Twitter size={18} /> },
+                { name: 'linkedin', icon: <Linkedin size={18} /> }
+              ].map((social) => (
+                <div key={social.name} className="w-10 h-10 glass rounded-xl flex items-center justify-center border border-white/10 hover:border-gold/30 cursor-pointer transition-all text-alabaster/40 hover:text-gold">
+                  {social.icon}
                 </div>
               ))}
             </div>
@@ -326,7 +350,7 @@ export default function Home() {
             <h4 className="font-bold mb-8 uppercase tracking-widest text-xs text-gold">Explore</h4>
             <ul className="space-y-4 text-alabaster/40 font-medium">
               <li><Link href="#" className="hover:text-alabaster transition-colors">Portfolio</Link></li>
-              <li><Link href="#" className="hover:text-alabaster transition-colors">AI Designer</Link></li>
+              <li><Link href="#design-lab" className="hover:text-alabaster transition-colors">AI Designer</Link></li>
               <li><Link href="#" className="hover:text-alabaster transition-colors">Pricing</Link></li>
             </ul>
           </div>
@@ -345,7 +369,7 @@ export default function Home() {
             © 2026 ELEVATION HOME DESIGN · ALL RIGHTS RESERVED
           </p>
           <div className="flex gap-12 text-[10px] text-alabaster/40 font-black tracking-widest uppercase">
-            <span>New York</span>
+            <span className="flex items-center gap-2"><MapPin size={10} /> New York</span>
             <span>Dubai</span>
             <span>London</span>
             <span>Tokyo</span>
