@@ -150,11 +150,12 @@ export default function Home() {
         </div>
 
         <motion.button 
-          whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(212, 175, 55, 0.3)" }}
+          whileHover={{ scale: 1.05, y: -2 }}
           whileTap={{ scale: 0.95 }}
-          className="px-8 py-3 bg-gradient-gold text-onyx font-black rounded-full text-xs tracking-widest"
+          className="relative px-8 py-3 rounded-full group overflow-hidden"
         >
-          CONSULT NOW
+          <div className="absolute inset-0 bg-gradient-gold animate-pulse group-hover:animate-none group-hover:scale-110 transition-transform duration-500"></div>
+          <span className="relative z-10 text-onyx font-black text-[10px] tracking-[0.2em]">CONSULT NOW</span>
         </motion.button>
       </motion.nav>
 
@@ -213,16 +214,26 @@ export default function Home() {
           transition={{ delay: 1.8 }}
           className="flex flex-col sm:flex-row gap-8 mb-32"
         >
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Link href="#design-lab" className="px-12 py-6 bg-gradient-gold text-onyx font-black text-xl rounded-2cl shadow-[0_20px_50px_rgba(212,175,55,0.3)] hover:shadow-gold/50 transition-all flex items-center gap-4 group">
-              INITIATE AI
-              <ArrowRight size={28} className="group-hover:translate-x-2 transition-transform" />
+          <motion.div 
+            whileHover={{ scale: 1.05 }} 
+            whileTap={{ scale: 0.98 }}
+            className="group relative"
+          >
+            {/* The Beautiful Button */}
+            <Link href="#design-lab" className="relative flex items-center gap-4 px-12 py-7 bg-onyx border border-gold/30 rounded-2xl overflow-hidden transition-all duration-500 shadow-[0_0_40px_rgba(212,175,55,0.1)] group-hover:shadow-[0_0_60px_rgba(212,175,55,0.3)] group-hover:border-gold">
+              <div className="absolute inset-0 bg-gradient-gold opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+              <div className="absolute -left-full top-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-[30deg] group-hover:animate-shine"></div>
+              
+              <span className="text-gradient-gold font-black text-2xl tracking-tighter">INITIATE AI</span>
+              <div className="p-2 bg-gradient-gold rounded-lg group-hover:rotate-[360deg] transition-transform duration-1000">
+                <ArrowRight size={24} className="text-onyx" />
+              </div>
             </Link>
           </motion.div>
 
           <motion.button 
-            whileHover={{ backgroundColor: "rgba(255,255,255,0.05)" }}
-            className="px-12 py-6 glass rounded-2cl border border-white/10 font-bold text-xl transition-all"
+            whileHover={{ backgroundColor: "rgba(255,255,255,0.05)", y: -5 }}
+            className="px-12 py-7 glass rounded-2xl border border-white/5 font-black text-xl tracking-tighter text-white/40 hover:text-white transition-all backdrop-blur-3xl"
           >
             THE GALLERY
           </motion.button>
