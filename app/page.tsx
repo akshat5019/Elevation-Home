@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { 
   ArrowRight, 
   Upload, 
@@ -24,7 +24,20 @@ export default function Home() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [designResult, setDesignResult] = useState<string | null>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const { scrollYProgress } = useScroll();
+  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+  const textY = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
 
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -40,7 +53,6 @@ export default function Home() {
 
   const startAnalysis = async () => {
     if (!selectedImage) return;
-    
     setIsAnalyzing(true);
     setDesignResult("");
     
@@ -51,308 +63,318 @@ export default function Home() {
     ];
 
     const randomReport = mockReports[Math.floor(Math.random() * mockReports.length)];
-    
     let currentText = "";
-    const words = randomReport.split(" ");
-    
-    for (let i = 0; i < words.length; i++) {
-      currentText += words[i] + " ";
+    const wordsArr = randomReport.split(" ");
+    for (let i = 0; i < wordsArr.length; i++) {
+      currentText += wordsArr[i] + " ";
       setDesignResult(currentText);
-      await new Promise(r => setTimeout(r, 70));
+      await new Promise(r => setTimeout(r, 50));
     }
-    
     setIsAnalyzing(false);
   };
 
+  const heroTitle = "Reimagine Your Living Space";
+  const heroWords = heroTitle.split(" ");
+
   return (
     <div className="relative min-h-screen bg-onyx text-alabaster overflow-hidden selection:bg-gold selection:text-onyx font-inter">
-      {/* Background Ambience */}
+      {/* Custom Cursor */}
       <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 2 }}
-        className="fixed inset-0 pointer-events-none"
-      >
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-gold/10 rounded-full blur-[120px] animate-pulse"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-gold/5 rounded-full blur-[150px]"></div>
+        className="fixed top-0 left-0 w-8 h-8 rounded-full border border-gold/50 pointer-events-none z-[9999] hidden md:block"
+        animate={{ x: mousePos.x - 16, y: mousePos.y - 16 }}
+        transition={{ type: "spring", damping: 25, stiffness: 250, mass: 0.5 }}
+      />
+      <motion.div 
+        className="fixed top-0 left-0 w-2 h-2 bg-gold rounded-full pointer-events-none z-[9999] hidden md:block"
+        animate={{ x: mousePos.x - 4, y: mousePos.y - 4 }}
+        transition={{ type: "spring", damping: 35, stiffness: 350, mass: 0.2 }}
+      />
+
+      {/* Background Ambience & Parallax Layer */}
+      <motion.div style={{ y: backgroundY }} className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-gold/10 rounded-full blur-[150px]"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[70%] h-[70%] bg-gold/5 rounded-full blur-[180px]"></div>
+        
+        {/* Floating Architectural Nodes */}
+        {[1, 2, 3, 4, 5].map((i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0 }}
+            animate={{ 
+              opacity: [0.1, 0.3, 0.1],
+              y: [0, -40, 0],
+              x: [0, 20, 0]
+            }}
+            transition={{ 
+              duration: 5 + i, 
+              repeat: Infinity,
+              delay: i * 0.5
+            }}
+            className="absolute bg-white/5 w-[1px] h-32"
+            style={{ 
+              top: `${i * 15}%`, 
+              left: `${10 + (i * 17)}%`,
+              transform: `rotate(${i * 45}deg)` 
+            }}
+          />
+        ))}
       </motion.div>
 
       {/* Navigation */}
       <motion.nav 
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        className="fixed top-0 w-full z-50 glass border-b border-white/5 px-8 py-6 flex justify-between items-center"
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+        className="fixed top-0 w-full z-50 glass border-b border-white/5 px-12 py-8 flex justify-between items-center"
       >
-        <div className="flex items-center gap-3 group cursor-pointer">
+        <div className="flex items-center gap-4 group cursor-pointer">
           <motion.div 
-            whileHover={{ rotate: 12, scale: 1.1 }}
-            className="w-10 h-10 bg-gradient-gold rounded-xl flex items-center justify-center shadow-lg shadow-gold/20"
+            whileHover={{ rotate: 180, scale: 1.1, borderRadius: "50%" }}
+            className="w-12 h-12 bg-gradient-gold rounded-2xl flex items-center justify-center shadow-2xl shadow-gold/20 transition-all duration-700"
           >
-            <span className="text-onyx font-bold text-2xl">E</span>
+            <span className="text-onyx font-black text-2xl">E</span>
           </motion.div>
-          <span className="text-2xl font-bold tracking-tighter text-gradient-gold uppercase">Elevation</span>
+          <span className="text-2xl font-black tracking-tighter text-gradient-gold uppercase">Elevation</span>
         </div>
 
-        <div className="hidden md:flex gap-1 gap-x-8 text-xs font-bold tracking-widest uppercase opacity-80">
-          {['AI Design Lab', 'Portfolio', 'Philosophy', 'About'].map((item) => (
-            <Link key={item} href={item === 'AI Design Lab' ? '#design-lab' : '#'} className="hover:text-gold transition-colors relative group">
+        <div className="hidden md:flex gap-x-12 text-[10px] font-black tracking-[0.3em] uppercase opacity-60">
+          {['AI Design Lab', 'Portfolio', 'About'].map((item) => (
+            <Link key={item} href={item === 'AI Design Lab' ? '#design-lab' : '#'} className="hover:text-gold transition-all relative group">
               {item}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gold transition-all group-hover:w-full"></span>
+              <motion.span 
+                className="absolute -bottom-2 left-0 w-0 h-[2px] bg-gold"
+                whileHover={{ width: "100%" }}
+              />
             </Link>
           ))}
         </div>
 
         <motion.button 
-          whileHover={{ scale: 1.05 }}
+          whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(212, 175, 55, 0.3)" }}
           whileTap={{ scale: 0.95 }}
-          className="px-6 py-2.5 bg-gradient-gold text-onyx font-bold rounded-full text-sm shadow-lg shadow-gold/10"
+          className="px-8 py-3 bg-gradient-gold text-onyx font-black rounded-full text-xs tracking-widest"
         >
-          GET IN TOUCH
+          CONSULT NOW
         </motion.button>
-      </nav>
+      </motion.nav>
 
       {/* Hero Section */}
-      <section className="relative pt-40 px-8 max-w-7xl mx-auto flex flex-col items-center justify-center text-center min-h-screen">
+      <section className="relative pt-40 px-8 flex flex-col items-center justify-center text-center min-h-screen">
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="inline-block px-4 py-1.5 glass rounded-full border border-gold/20 mb-8 transform cursor-default"
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ duration: 1.5, ease: "circOut" }}
+          className="mb-12"
         >
-          <span className="text-xs font-bold tracking-[0.2em] text-gold uppercase">Industry Leading AI Interior Design</span>
+          <div className="px-6 py-2 glass rounded-full border border-gold/20 mb-8">
+            <motion.span 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1 }}
+              className="text-[10px] font-black tracking-[0.4em] text-gold uppercase"
+            >
+              The Pinnacle of AI Architecture
+            </motion.span>
+          </div>
         </motion.div>
 
-        <motion.h1 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
-          className="text-6xl md:text-8xl font-black tracking-tighter leading-[1.1] mb-8"
-        >
-          Reimagine Your <br />
-          <span className="text-gradient-gold italic font-display font-medium">Living Space</span>
-        </motion.h1>
+        <motion.div style={{ y: textY }} className="mb-8">
+          <h1 className="text-7xl md:text-[10rem] font-black tracking-tighter leading-[0.85] flex flex-wrap justify-center gap-x-6">
+            {heroWords.map((word, i) => (
+              <motion.span
+                key={i}
+                initial={{ y: 100, opacity: 0, rotateX: -45 }}
+                animate={{ y: 0, opacity: 1, rotateX: 0 }}
+                transition={{ 
+                  delay: 0.5 + (i * 0.1), 
+                  duration: 0.8, 
+                  ease: [0.22, 1, 0.36, 1] 
+                }}
+                className={`inline-block ${i >= 2 ? 'text-gradient-gold italic font-display font-medium' : ''}`}
+              >
+                {word}
+              </motion.span>
+            ))}
+          </h1>
+        </motion.div>
 
         <motion.p 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 1 }}
-          className="max-w-2xl text-lg text-alabaster/60 leading-relaxed mb-12"
+          transition={{ delay: 1.5, duration: 2 }}
+          className="max-w-3xl text-xl text-alabaster/40 leading-relaxed mb-16 font-light italic"
         >
-          We combine the precision of Artificial Intelligence with the soul of bespoke architecture to transform your envisions into luxurious reality.
+          Where biological intuition meets computational perfection. We don't just design rooms; we engineer atmospheres.
         </motion.p>
 
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-          className="flex flex-col sm:flex-row gap-6 mb-20"
+          transition={{ delay: 1.8 }}
+          className="flex flex-col sm:flex-row gap-8 mb-32"
         >
-          <Link href="#design-lab" className="px-10 py-5 bg-gradient-gold text-onyx font-black text-lg rounded-2xl shadow-2xl shadow-gold/30 hover:shadow-gold/50 hover:-translate-y-1 transition-all flex items-center gap-3 group">
-            TRY AI DESIGNER
-            <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
-          </Link>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Link href="#design-lab" className="px-12 py-6 bg-gradient-gold text-onyx font-black text-xl rounded-2cl shadow-[0_20px_50px_rgba(212,175,55,0.3)] hover:shadow-gold/50 transition-all flex items-center gap-4 group">
+              INITIATE AI
+              <ArrowRight size={28} className="group-hover:translate-x-2 transition-transform" />
+            </Link>
+          </motion.div>
 
-          <button className="px-10 py-5 glass rounded-2xl border border-white/10 font-bold text-lg hover:bg-white/10 hover:-translate-y-1 transition-all">
-            VIEW WORKS
-          </button>
+          <motion.button 
+            whileHover={{ backgroundColor: "rgba(255,255,255,0.05)" }}
+            className="px-12 py-6 glass rounded-2cl border border-white/10 font-bold text-xl transition-all"
+          >
+            THE GALLERY
+          </motion.button>
         </motion.div>
 
-        {/* Floating Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full mt-auto py-12">
+        {/* Cinematic Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 w-full max-w-7xl pb-24">
           {[
-            { val: "15k+", label: "Gen Designs" },
-            { val: "99%", label: "Accuracy" },
-            { val: "24/7", label: "Consultation" },
-            { val: "Instant", label: "Results" }
+            { val: "15k+", label: "Design Iterations" },
+            { val: "0.4s", label: "Analysis Speed" },
+            { val: "100%", label: "Uniqueness" },
+            { val: "Global", label: "Presence" }
           ].map((stat, i) => (
             <motion.div 
               key={i} 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
+              whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="glass p-8 rounded-3xl border border-white/5 group hover:border-gold/30 transition-all animate-float" 
-              style={{ animationDelay: `${i * 0.5}s` }}
+              transition={{ delay: i * 0.2 }}
+              className="glass p-10 rounded-[40px] border border-white/5 relative overflow-hidden group"
             >
-              <h3 className="text-3xl font-black text-gradient-gold mb-1">{stat.val}</h3>
-              <p className="text-xs uppercase tracking-widest text-alabaster/40 font-bold">{stat.label}</p>
+              <motion.div 
+                className="absolute inset-0 bg-gold/5 translate-y-full group-hover:translate-y-0 transition-transform duration-700"
+              />
+              <h3 className="text-4xl font-black text-gradient-gold mb-2 relative z-10">{stat.val}</h3>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-alabaster/30 font-black relative z-10">{stat.label}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
       {/* AI DESIGN LAB SECTION */}
-      <section id="design-lab" className="py-32 px-8 max-w-7xl mx-auto scroll-mt-24">
+      <section id="design-lab" className="py-40 px-8 max-w-7xl mx-auto scroll-mt-24">
         <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          className="glass p-1 md:p-12 rounded-[50px] border border-white/5 overflow-hidden"
+          initial={{ opacity: 0, y: 100 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          viewport={{ once: true, margin: "-100px" }}
+          className="glass p-1 md:p-20 rounded-[80px] border border-white/5 relative"
         >
-          <div className="grid lg:grid-cols-2 gap-16 items-center p-8 md:p-0">
-            <div>
+          <div className="grid lg:grid-cols-2 gap-24 items-center">
+            <div className="relative z-10">
               <motion.h2 
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                className="text-4xl md:text-5xl font-black mb-6 leading-tight"
+                initial={{ clipPath: "inset(0 100% 0 0)" }}
+                whileInView={{ clipPath: "inset(0 0% 0 0)" }}
+                transition={{ duration: 1, delay: 0.5 }}
+                className="text-5xl md:text-7xl font-black mb-10 leading-[0.9]"
               >
-                Experience the <span className="text-gradient-gold font-display font-medium">AI Design Lab</span>
+                The <span className="text-gradient-gold font-display font-medium">Neural</span> <br /> Architect
               </motion.h2>
-              <motion.p 
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-                className="text-alabaster/60 text-lg mb-8 leading-relaxed"
-              >
-                Upload a photo of your current space and let our proprietary AI engine redesign it with luxury aesthetics in seconds.
-              </motion.p>
+              <p className="text-alabaster/40 text-xl mb-12 font-light leading-relaxed italic">
+                Our vision algorithms analyze spatial volume, light dispersion, and materiality to reconstruct your environment with god-tier precision.
+              </p>
 
-              <ul className="space-y-4 mb-10">
-                {[
-                  "Intelligent lighting optimization",
-                  "Material & texture recommendation",
-                  "Architectural layout analysis",
-                  "Bespoke furniture selection"
-                ].map((item, i) => (
-                  <motion.li 
-                    key={i} 
-                    initial={{ opacity: 0, x: -20 }}
+              <div className="space-y-6 mb-16">
+                {["Volumetric Scanning", "Material Synthesis", "Dynamic Lighting"].map((item, i) => (
+                  <motion.div 
+                    key={i}
+                    initial={{ opacity: 0, x: -50 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 + 0.3 }}
-                    className="flex items-center gap-3 text-alabaster/80 font-medium"
+                    transition={{ delay: 0.8 + (i * 0.1) }}
+                    className="flex items-center gap-6"
                   >
-                    <div className="w-6 h-6 rounded-full bg-gold/20 flex items-center justify-center border border-gold/40">
-                      <Check size={14} className="text-gold" strokeWidth={3} />
+                    <div className="w-8 h-8 rounded-full bg-gold/10 flex items-center justify-center border border-gold/20">
+                      <Check size={16} className="text-gold" />
                     </div>
-                    {item}
-                  </motion.li>
+                    <span className="text-lg font-black tracking-widest text-alabaster/80 uppercase text-[12px]">{item}</span>
+                  </motion.div>
                 ))}
-              </ul>
+              </div>
 
-              <input
-                type="file"
-                className="hidden"
-                ref={fileInputRef}
-                onChange={handleUpload}
-                accept="image/*"
-              />
+              <input type="file" className="hidden" ref={fileInputRef} onChange={handleUpload} accept="image/*" />
 
-              {!selectedImage ? (
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full md:w-auto px-10 py-5 glass-gold border border-gold/30 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-gold/10 transition-all group"
-                >
-                  <Upload size={24} className="text-gold animate-bounce" />
-                  UPLOAD YOUR ROOM IMAGE
-                </motion.button>
-              ) : (
-                <div className="flex flex-col gap-4">
-                  <motion.button
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={startAnalysis}
-                    disabled={isAnalyzing}
-                    className="w-full md:w-auto px-10 py-5 bg-gradient-gold text-onyx font-bold rounded-2xl flex items-center justify-center gap-3 hover:shadow-xl hover:shadow-gold/20 transition-all disabled:opacity-50"
-                  >
-                    {isAnalyzing ? (
-                      <>
-                        <motion.div 
-                          animate={{ rotate: 360 }}
-                          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                          className="w-5 h-5 border-3 border-onyx/30 border-t-onyx rounded-full"
-                        />
-                        AI ANALYZING SPACE...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles size={24} />
-                        GENERATE LUXURY REDESIGN
-                      </>
-                    )}
-                  </motion.button>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                {!selectedImage ? (
                   <button
-                    onClick={() => setSelectedImage(null)}
-                    className="text-sm font-bold text-alabaster/40 hover:text-red-500 transition-colors uppercase tracking-widest"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full px-12 py-8 glass-gold border border-gold/30 rounded-3xl font-black text-xs tracking-[0.4em] hover:bg-gold/10 transition-all flex items-center justify-center gap-6"
                   >
-                    Remove and try another
+                    <Upload size={24} className="text-gold" />
+                    UPLOAD VISION
                   </button>
-                </div>
-              )}
-            </div>
-
-            <div className="relative">
-              {/* Image Preview Window */}
-              <motion.div 
-                layout
-                className="relative aspect-[4/3] glass rounded-3xl overflow-hidden border border-white/10 group shadow-2xl"
-              >
-                {selectedImage ? (
-                  <>
-                    <motion.img
-                      initial={{ scale: 1.1, filter: "blur(10px)" }}
-                      animate={{ scale: 1, filter: "blur(0px)" }}
-                      src={selectedImage}
-                      alt="Preview"
-                      className={`w-full h-full object-cover transition-all duration-1000 ${isAnalyzing ? 'blur-md scale-110 opacity-50' : 'blur-0 scale-100 opacity-100'}`}
-                    />
-                    {isAnalyzing && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="relative w-full h-full">
-                          <motion.div 
-                            animate={{ top: ["0%", "100%", "0%"] }}
-                            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                            className="absolute left-0 w-full h-1 bg-gold shadow-[0_0_20px_#D4AF37]"
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </>
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-alabaster/20 p-12 text-center">
-                    <ImageIcon size={80} strokeWidth={0.5} className="mb-6" />
-                    <p className="text-xl font-medium tracking-tight">Your AI preview will appear here</p>
+                  <div className="flex flex-col gap-6">
+                    <button
+                      onClick={startAnalysis}
+                      disabled={isAnalyzing}
+                      className="w-full px-12 py-8 bg-gradient-gold text-onyx font-black text-xs tracking-[0.4em] rounded-3xl flex items-center justify-center gap-6 shadow-2xl shadow-gold/20"
+                    >
+                      {isAnalyzing ? "NEURAL PROCESSING..." : "EXECUTE REDESIGN"}
+                      {!isAnalyzing && <Sparkles size={24} />}
+                    </button>
+                    <button onClick={() => setSelectedImage(null)} className="text-[10px] font-black tracking-[0.5em] text-alabaster/20 hover:text-red-500 uppercase">Reset System</button>
                   </div>
                 )}
               </motion.div>
+            </div>
 
-              {/* Design Results Overlay */}
+            <div className="relative">
+              <motion.div 
+                layout
+                className="relative aspect-[3/4] glass rounded-[60px] overflow-hidden border border-white/10 shadow-[0_50px_100px_rgba(0,0,0,0.5)]"
+              >
+                <AnimatePresence mode="wait">
+                  {selectedImage ? (
+                    <motion.div key="image" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-full h-full relative">
+                      <motion.img
+                        src={selectedImage}
+                        alt="Vision"
+                        className={`w-full h-full object-cover transition-all duration-[2000ms] ${isAnalyzing ? 'blur-2xl scale-125 saturate-0' : 'blur-0 scale-100'}`}
+                      />
+                      {isAnalyzing && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <motion.div 
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                            className="w-32 h-32 border-2 border-gold/20 border-t-gold rounded-full"
+                          />
+                          <motion.div 
+                            animate={{ scale: [1, 1.5, 1], opacity: [0.5, 1, 0.5] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                            className="absolute bg-gold w-4 h-4 rounded-full blur-md"
+                          />
+                        </div>
+                      )}
+                    </motion.div>
+                  ) : (
+                    <motion.div key="empty" className="w-full h-full flex flex-col items-center justify-center text-alabaster/10 p-24 text-center">
+                      <ImageIcon size={120} strokeWidth={0.2} className="mb-12" />
+                      <p className="text-2xl font-black tracking-tighter uppercase">Awaiting Visual Input</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+
               <AnimatePresence>
                 {designResult && (
                   <motion.div 
-                    initial={{ opacity: 0, y: 40, scale: 0.9 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    className="absolute -bottom-10 -right-4 md:-right-10 w-full max-w-sm glass-gold border border-gold/40 p-8 rounded-3xl shadow-2xl z-10"
+                    initial={{ x: 100, opacity: 0, rotateY: 45 }}
+                    animate={{ x: 0, opacity: 1, rotateY: 0 }}
+                    transition={{ type: "spring", damping: 20 }}
+                    className="absolute -bottom-20 -right-12 w-[110%] max-w-sm glass-gold border border-gold/50 p-10 rounded-[40px] shadow-[0_40px_80px_rgba(0,0,0,0.6)] z-20"
                   >
-                    <div className="flex items-center gap-2 mb-4">
-                      <motion.span 
-                        animate={{ opacity: [1, 0.5, 1] }}
-                        transition={{ duration: 1, repeat: Infinity }}
-                        className="w-2 h-2 bg-green-500 rounded-full"
-                      />
-                      <span className="text-xs font-bold text-gold uppercase tracking-[0.2em]">AI Design Report</span>
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-3 h-3 bg-green-500 rounded-full animate-ping" />
+                      <span className="text-[10px] font-black text-gold uppercase tracking-[0.5em]">Neural Synthesis Complete</span>
                     </div>
-                    <h4 className="text-xl font-black mb-4">Recommended Aesthetic</h4>
+                    <h4 className="text-2xl font-black mb-6 leading-none">Architectural Mutation</h4>
                     <motion.div
-                      className="text-alabaster/80 text-sm leading-relaxed whitespace-pre-line"
-                      dangerouslySetInnerHTML={{ __html: designResult.replace(/\*\*(.*?)\*\*/g, '<b class="text-gold">$1</b>') }}
+                      className="text-alabaster/70 text-sm leading-relaxed space-y-4"
+                      dangerouslySetInnerHTML={{ __html: designResult.replace(/\*\*(.*?)\*\*/g, '<b class="text-white font-black">$1</b>').replace(/\n/g, '<br/>') }}
                     />
-                    <div className="mt-6 flex gap-3">
-                      <button className="flex-1 py-2 rounded-xl bg-gold/10 border border-gold/20 text-gold text-xs font-bold hover:bg-gold/20 transition-all uppercase tracking-wider flex items-center justify-center gap-2">
-                        <Download size={14} /> Download PDF
-                      </button>
-                      <button className="px-4 py-2 rounded-xl glass border border-white/10 text-xs font-bold hover:bg-white/10 transition-all uppercase">
-                        <Share2 size={14} />
-                      </button>
-                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -362,147 +384,81 @@ export default function Home() {
       </section>
 
       {/* Philosophy Section */}
-      <section className="py-40 px-8 max-w-7xl mx-auto">
-        <div className="flex flex-col items-center mb-28 text-center">
-          <motion.div 
-            initial={{ scale: 0 }}
-            whileInView={{ scale: 1 }}
+      <section className="py-60 px-8 max-w-7xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-32 mb-40">
+          <motion.div
+            initial={{ opacity: 0, x: -100 }}
+            whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="w-12 h-12 bg-gold/10 rounded-full flex items-center justify-center mb-6"
           >
-            <div className="w-2 h-2 bg-gold rounded-full"></div>
+            <h2 className="text-7xl font-black tracking-tighter mb-12">The <br /> Philosophy <br /> of Flow</h2>
+            <p className="text-alabaster/30 text-2xl font-light italic leading-relaxed">
+              "Architecture is not about space, but about the time spent within it."
+            </p>
           </motion.div>
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-4xl md:text-6xl font-black mb-8 tracking-tighter"
-          >
-            Our Design Pillars
-          </motion.h2>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="max-w-xl text-alabaster/50"
-          >
-            Blending traditional luxury with modern computation.
-          </motion.p>
-        </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {[
-            {
-              title: "Computational Layouts",
-              desc: "Optimal space utilization generated through thousands of algorithmic iterations.",
-              icon: <Layers size={32} className="text-gold" />
-            },
-            {
-              title: "Material Science",
-              desc: "AI-curated textures and sustainable materials that resonate with your personal style.",
-              icon: <Zap size={32} className="text-gold" />
-            },
-            {
-              title: "Bespoke Finishing",
-              desc: "The final human touch by master architects to ensure perfection in every corner.",
-              icon: <ShieldCheck size={32} className="text-gold" />
-            }
-          ].map((feature, i) => (
-            <motion.div 
-              key={i} 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.2 }}
-              whileHover={{ y: -10 }}
-              className="glass group p-12 rounded-[50px] border border-white/5 hover:bg-white/10 hover:border-gold/20 transition-all duration-500"
-            >
-              <div className="w-16 h-16 bg-gold/5 rounded-2xl flex items-center justify-center mb-10 border border-white/5 group-hover:border-gold/40 transition-all group-hover:rotate-6">
-                {feature.icon}
-              </div>
-              <h3 className="text-2xl font-black mb-5 group-hover:text-gold transition-colors">{feature.title}</h3>
-              <p className="text-alabaster/50 leading-relaxed group-hover:text-alabaster transition-colors italic">{feature.desc}</p>
-            </motion.div>
-          ))}
+          <div className="grid gap-12 pt-12">
+            {[
+              { title: "Volumetric Flow", desc: "Algorithmic pathfinding for human movement.", icon: <Layers size={40} /> },
+              { title: "Material Soul", desc: "Synthesis of sustainable and luxury textures.", icon: <Zap size={40} /> },
+              { title: "Shielded Security", desc: "Bespoke privacy through geometric occlusion.", icon: <ShieldCheck size={40} /> }
+            ].map((feature, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.2 }}
+                className="flex items-center gap-12 group p-8 glass-transparent hover:bg-white/5 rounded-[40px] transition-all"
+              >
+                <div className="text-gold shrink-0 group-hover:scale-125 transition-transform duration-500">{feature.icon}</div>
+                <div>
+                  <h3 className="text-2xl font-black mb-2 uppercase tracking-widest">{feature.title}</h3>
+                  <p className="text-alabaster/40">{feature.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-8">
-        <motion.div 
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="max-w-7xl mx-auto glass p-20 rounded-[60px] border border-gold/10 text-center relative overflow-hidden group"
-        >
-          <div className="absolute top-0 right-0 w-64 h-64 bg-gold/5 rounded-full blur-[100px] group-hover:scale-110 transition-transform"></div>
-          <h2 className="text-4xl md:text-6xl font-black mb-10 tracking-tighter">Ready to Elevate Your Home?</h2>
-          <motion.button 
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-12 py-6 bg-gradient-gold text-onyx font-black text-xl rounded-2xl shadow-2xl shadow-gold/20 hover:shadow-gold/40 transition-all"
-          >
-            BOOK A PRIVATE CONSULTATION
-          </motion.button>
-        </motion.div>
       </section>
 
       {/* Footer */}
-      <footer className="py-20 border-t border-white/5 px-8 bg-onyx-light/30">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 mb-20">
-          <div className="col-span-2">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-8 h-8 bg-gradient-gold rounded-lg flex items-center justify-center">
-                <span className="text-onyx font-bold text-lg">E</span>
+      <footer className="py-40 bg-black/40 border-t border-white/5 px-12">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-32">
+          <div className="col-span-1">
+            <div className="flex items-center gap-4 mb-20">
+              <div className="w-10 h-10 bg-gradient-gold rounded-xl flex items-center justify-center">
+                <span className="text-onyx font-black">E</span>
               </div>
-              <span className="text-xl font-black tracking-tighter text-gradient-gold uppercase">Elevation</span>
+              <span className="text-xl font-black tracking-[0.3em] text-gradient-gold uppercase">Elevation</span>
             </div>
-            <p className="text-alabaster/40 max-w-sm leading-relaxed mb-8">
-              The future of luxury living, defined by artificial intelligence and crafted by world-class architects.
-            </p>
-            <div className="flex gap-6">
-              {[
-                { name: 'instagram', icon: <Instagram size={18} /> },
-                { name: 'twitter', icon: <Twitter size={18} /> },
-                { name: 'linkedin', icon: <Linkedin size={18} /> }
-              ].map((social) => (
-                <motion.div 
-                  key={social.name} 
-                  whileHover={{ y: -5, color: '#D4AF37' }}
-                  className="w-10 h-10 glass rounded-xl flex items-center justify-center border border-white/10 cursor-pointer transition-all text-alabaster/40"
-                >
-                  {social.icon}
+            <div className="flex gap-12 mb-20">
+              {[Instagram, Twitter, Linkedin].map((Icon, i) => (
+                <motion.div key={i} whileHover={{ y: -10, color: '#D4AF37' }} className="text-alabaster/20 cursor-pointer">
+                  <Icon size={32} strokeWidth={1.5} />
                 </motion.div>
               ))}
             </div>
           </div>
 
-          <div>
-            <h4 className="font-bold mb-8 uppercase tracking-widest text-xs text-gold">Explore</h4>
-            <ul className="space-y-4 text-alabaster/40 font-medium">
-              <li><Link href="#" className="hover:text-gold transition-colors">Portfolio</Link></li>
-              <li><Link href="#design-lab" className="hover:text-gold transition-colors">AI Designer</Link></li>
-              <li><Link href="#" className="hover:text-gold transition-colors">Pricing</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-bold mb-8 uppercase tracking-widest text-xs text-gold">Legal</h4>
-            <ul className="space-y-4 text-alabaster/40 font-medium">
-              <li><Link href="#" className="hover:text-gold transition-colors">Privacy Policy</Link></li>
-              <li><Link href="#" className="hover:text-gold transition-colors">Terms of Service</Link></li>
-            </ul>
+          <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-20">
+            {['Portfolio', 'Philosophy', 'AI Designer', 'Legal'].map((group) => (
+              <div key={group}>
+                <h4 className="text-[10px] font-black tracking-[0.5em] text-white/20 uppercase mb-12">{group}</h4>
+                <div className="flex flex-col gap-6 text-[12px] font-black tracking-widest text-alabaster/40 uppercase">
+                  <Link href="#" className="hover:text-gold transition-colors">Link One</Link>
+                  <Link href="#" className="hover:text-gold transition-colors">Link Two</Link>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 pt-12 border-t border-white/5">
-          <p className="text-[10px] text-alabaster/30 uppercase tracking-[0.4em] font-black">
-            © 2026 ELEVATION HOME DESIGN · ALL RIGHTS RESERVED
-          </p>
-          <div className="flex gap-12 text-[10px] text-alabaster/40 font-black tracking-widest uppercase">
-            <span className="flex items-center gap-2"><MapPin size={10} /> New York</span>
+        <div className="max-w-7xl mx-auto pt-40 flex flex-col md:flex-row justify-between items-center gap-20 opacity-20">
+          <p className="text-[8px] font-black tracking-[1em] uppercase">Built with Neural Networks & Gold Dust</p>
+          <div className="flex gap-20 text-[8px] font-black tracking-[0.5em] uppercase">
             <span>Dubai</span>
-            <span>London</span>
+            <span>New York</span>
             <span>Tokyo</span>
           </div>
         </div>
