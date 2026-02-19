@@ -27,41 +27,26 @@ export default function Home() {
     setIsAnalyzing(true);
     setDesignResult("");
     
-    try {
-      const response = await fetch("/api/design", {
-        method: "POST",
-        body: JSON.stringify({ image: selectedImage }),
-        headers: { "Content-Type": "application/json" },
-      });
+    // Simulations of different luxury aesthetics
+    const mockReports = [
+      "## Recommended Aesthetic: **Contemporary Gold & Marble**\n\nBased on your space's architectural geometry, we recommend a palette of **Brushed Gold** and **Calacatta Marble**. \n\n### Key Enhancements:\n1. **Lighting:** Install recessed cove lighting along the ceiling perimeter to create a 'floating' effect.\n2. **Materials:** Replace current flooring with large-format stone tiles to expand the visual volume.\n3. **Furniture:** Introduce low-profile velvet seating in charcoal to provide a sophisticated contrast.",
+      "## Recommended Aesthetic: **Modern Zenith Minimalist**\n\nYour room's natural lighting profile suggests a **Zenith Minimalist** approach. Focus on 'quiet luxury' through high-end textures rather than ornamentation.\n\n### Key Enhancements:\n1. **Layout:** Pivot the seating arrangement 45 degrees toward the primary light source to enhance circadian flow.\n2. **Textures:** Layer raw silk curtains with wool-mohair rugs for a multi-sensory experience.\n3. **Art:** A single oversized monochromatic canvas will ground the room's energy.",
+      "## Recommended Aesthetic: **The Sovereign Heights (Bespoke Luxury)**\n\nWe have identified a unique opportunity for a **Sovereign Heights** redesign, blending industrial elements with high-fashion interior accents.\n\n### Key Enhancements:\n1. **Ceiling:** Dark-tinted mirrored panels will double the perceived height and reflect ambient evening light.\n2. **Lighting:** A signature hand-blown glass chandelier should serve as the room's gravitational center.\n3. **Detailing:** Utilize black-steel framing for all transitions to provide a sharp, architectural edge."
+    ];
 
-      if (!response.ok) throw new Error("Failed to analyze image");
-
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let fullText = "";
-
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          const chunk = decoder.decode(value);
-          // Vercel AI SDK data stream prefix check (usually '0:"text"')
-          const lines = chunk.split("\n");
-          for (const line of lines) {
-            if (line.startsWith('0:')) {
-              const content = line.substring(3).replace(/^"|"$/g, '').replace(/\\n/g, '\n');
-              fullText += content;
-              setDesignResult(fullText);
-            }
-          }
-        }
-      }
-    } catch (error) {
-      console.error("AI Analysis Error:", error);
-      setDesignResult("Error: Could not analyze image. Please ensure your API key is set.");
-    } finally {
-      setIsAnalyzing(false);
+    const randomReport = mockReports[Math.floor(Math.random() * mockReports.length)];
+    
+    // Simulate streaming effect for a premium feel
+    let currentText = "";
+    const words = randomReport.split(" ");
+    
+    for (let i = 0; i < words.length; i++) {
+      currentText += words[i] + " ";
+      setDesignResult(currentText);
+      await new Promise(r => setTimeout(r, 70)); // Premium streaming speed
     }
+    
+    setIsAnalyzing(false);
   };
 
   return (
